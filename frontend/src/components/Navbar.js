@@ -1,229 +1,120 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { 
-  FaWallet, 
-  FaUser, 
-  FaGavel, 
-  FaPlus, 
-  FaHome,
-  FaBars,
-  FaTimes,
-  FaCrown
-} from 'react-icons/fa';
-import { formatAddress } from '../utils/web3Utils';
-import '../styles/Navbar.css';
+import { Navbar as BSNavbar, Nav, Container, Button, Dropdown } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { FaUser, FaMoon, FaSun, FaGavel } from 'react-icons/fa';
+import KYCVerification from './KYCVerification';
 
-const Navbar = ({ account, user, onConnectWallet, onDisconnectWallet, isConnecting }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation();
+const Navbar = () => {
+  const { user, logout, theme, toggleTheme } = useAuth();
+  const navigate = useNavigate();
+  const [showKYC, setShowKYC] = useState(false);
 
-  const isActive = (path) => location.pathname === path;
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
-    <motion.nav 
-      className="navbar"
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="navbar-container">
-        {/* Logo */}
-        <Link to="/" className="navbar-brand" onClick={closeMobileMenu}>
-          <div className="logo">
-            <FaGavel className="logo-icon" />
-            <span className="logo-text">AuctionHub</span>
-          </div>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <div className="navbar-menu">
-          <Link 
-            to="/" 
-            className={`nav-link ${isActive('/') ? 'active' : ''}`}
-          >
-            <FaHome />
-            <span>Home</span>
-          </Link>
+    <>
+      <BSNavbar bg={theme === 'dark' ? 'dark' : 'light'} variant={theme} fixed="top" expand="lg" className="shadow-sm">
+        <Container>
+          <BSNavbar.Brand as={Link} to="/" className="fw-bold d-flex align-items-center">
+            <FaGavel className="me-2 text-primary" size={24} />
+            AuctionBlock
+          </BSNavbar.Brand>
           
-          <Link 
-            to="/auctions" 
-            className={`nav-link ${isActive('/auctions') ? 'active' : ''}`}
-          >
-            <FaGavel />
-            <span>Auctions</span>
-          </Link>
+          <BSNavbar.Toggle aria-controls="basic-navbar-nav" />
           
-          {account && user && (
-            <Link 
-              to="/create-auction" 
-              className={`nav-link ${isActive('/create-auction') ? 'active' : ''}`}
-            >
-              <FaPlus />
-              <span>Create</span>
-            </Link>
-          )}
-          
-          {account && user && user.isAdmin && (
-            <Link 
-              to="/admin" 
-              className={`nav-link admin-link ${isActive('/admin') ? 'active' : ''}`}
-            >
-              <FaCrown />
-              <span>Admin</span>
-            </Link>
-          )}
-        </div>
-
-        {/* User Section */}
-        <div className="navbar-user">
-          {account ? (
-            <div className="user-menu">
-              <Link to="/profile" className="user-info" onClick={closeMobileMenu}>
-                <div className="user-avatar">
-                  <FaUser />
-                </div>
-                <div className="user-details">
-                  <span className="user-address">{formatAddress(account)}</span>
-                  {user && (
-                    <span className="user-status">
-                      {user.isAdmin ? '👑 Admin' : user.isVerified ? '✅ Verified' : '⏳ Pending'}
-                    </span>
+          <BSNavbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              <Nav.Link as={Link} to="/" className="fw-medium">
+                Home
+              </Nav.Link>
+              <Nav.Link as={Link} to="/auctions" className="fw-medium">
+                Auctions
+              </Nav.Link>
+              {user && (
+                <>
+                  <Nav.Link as={Link} to="/upload" className="fw-medium">
+                    Upload Product
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/my-bids" className="fw-medium">
+                    My Bids
+                  </Nav.Link>
+                  {user.isAdmin ? (
+                    <Nav.Link as={Link} to="/admin" className="fw-medium text-warning">
+                      Admin Dashboard
+                    </Nav.Link>
+                  ) : (
+                    <Nav.Link as={Link} to="/apply-admin" className="fw-medium text-info">
+                      Apply for Admin
+                    </Nav.Link>
                   )}
-                </div>
-              </Link>
+                </>
+              )}
+            </Nav>
+            
+            <Nav className="align-items-center">
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                onClick={toggleTheme}
+                className="me-3"
+              >
+                {theme === 'light' ? <FaMoon /> : <FaSun />}
+              </Button>
               
-              <button 
-                onClick={onDisconnectWallet}
-                className="btn btn-outline disconnect-btn"
-              >
-                Disconnect
-              </button>
-            </div>
-          ) : (
-            <button 
-              onClick={onConnectWallet}
-              disabled={isConnecting}
-              className="btn btn-primary connect-btn"
-            >
-              <FaWallet />
-              {isConnecting ? 'Connecting...' : 'Connect Wallet'}
-            </button>
-          )}
-        </div>
-
-        {/* Mobile Menu Toggle */}
-        <button 
-          className="mobile-menu-toggle"
-          onClick={toggleMobileMenu}
-        >
-          {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      <motion.div 
-        className={`mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}
-        initial={{ height: 0, opacity: 0 }}
-        animate={{ 
-          height: isMobileMenuOpen ? 'auto' : 0,
-          opacity: isMobileMenuOpen ? 1 : 0
-        }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="mobile-menu-content">
-          <Link 
-            to="/" 
-            className={`mobile-nav-link ${isActive('/') ? 'active' : ''}`}
-            onClick={closeMobileMenu}
-          >
-            <FaHome />
-            <span>Home</span>
-          </Link>
-          
-          <Link 
-            to="/auctions" 
-            className={`mobile-nav-link ${isActive('/auctions') ? 'active' : ''}`}
-            onClick={closeMobileMenu}
-          >
-            <FaGavel />
-            <span>Auctions</span>
-          </Link>
-          
-          {account && user && (
-            <Link 
-              to="/create-auction" 
-              className={`mobile-nav-link ${isActive('/create-auction') ? 'active' : ''}`}
-              onClick={closeMobileMenu}
-            >
-              <FaPlus />
-              <span>Create Auction</span>
-            </Link>
-          )}
-          
-          {account && user && user.isAdmin && (
-            <Link 
-              to="/admin" 
-              className={`mobile-nav-link admin-link ${isActive('/admin') ? 'active' : ''}`}
-              onClick={closeMobileMenu}
-            >
-              <FaCrown />
-              <span>Admin Panel</span>
-            </Link>
-          )}
-
-          <div className="mobile-user-section">
-            {account ? (
-              <div className="mobile-user-info">
-                <Link to="/profile" onClick={closeMobileMenu}>
-                  <div className="mobile-user-avatar">
-                    <FaUser />
-                  </div>
-                  <div className="mobile-user-details">
-                    <span className="mobile-user-address">{formatAddress(account)}</span>
-                    {user && (
-                      <span className="mobile-user-status">
-                        {user.isAdmin ? '👑 Admin' : user.isVerified ? '✅ Verified' : '⏳ Pending'}
-                      </span>
+              {user ? (
+                <Dropdown align="end">
+                  <Dropdown.Toggle variant="outline-primary" id="dropdown-basic" className="d-flex align-items-center">
+                    <FaUser className="me-2" />
+                    {user.name}
+                  </Dropdown.Toggle>
+                  
+                  <Dropdown.Menu>
+                    <Dropdown.Item as={Link} to="/profile">
+                      Profile
+                    </Dropdown.Item>
+                    {!user.isVerified && (
+                      <Dropdown.Item onClick={() => setShowKYC(true)} className="text-warning">
+                        Complete KYC
+                      </Dropdown.Item>
                     )}
-                  </div>
-                </Link>
-                
-                <button 
-                  onClick={() => {
-                    onDisconnectWallet();
-                    closeMobileMenu();
-                  }}
-                  className="btn btn-outline disconnect-btn"
-                >
-                  Disconnect Wallet
-                </button>
-              </div>
-            ) : (
-              <button 
-                onClick={() => {
-                  onConnectWallet();
-                  closeMobileMenu();
-                }}
-                disabled={isConnecting}
-                className="btn btn-primary connect-btn mobile-connect"
-              >
-                <FaWallet />
-                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
-              </button>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    </motion.nav>
+                    <Dropdown.Divider />
+                    <Dropdown.Item onClick={handleLogout} className="text-danger">
+                      Logout
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              ) : (
+                <div>
+                  <Button
+                    as={Link}
+                    to="/login"
+                    variant="outline-primary"
+                    size="sm"
+                    className="me-2"
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    as={Link}
+                    to="/signup"
+                    variant="primary"
+                    size="sm"
+                  >
+                    Signup
+                  </Button>
+                </div>
+              )}
+            </Nav>
+          </BSNavbar.Collapse>
+        </Container>
+      </BSNavbar>
+
+      <KYCVerification show={showKYC} onHide={() => setShowKYC(false)} />
+    </>
   );
 };
 
