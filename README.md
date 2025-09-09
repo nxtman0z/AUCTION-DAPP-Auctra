@@ -1,6 +1,10 @@
 # 🪙 Auction DApp – Auctra
 
-🚀 Live Demo: [Auction DApp – Auctra](https://auction-dapp-auctra-2lis.vercel.app/)
+<p align="center">
+  <a href="https://auction-dapp-auctra-2lis.vercel.app/">
+    <img src="https://img.shields.io/badge/🚀 View Live Demo-blue?style=for-the-badge" alt="Live Demo" />
+  </a>
+</p>
 
 ---
 
@@ -35,4 +39,4 @@ Auctra is a decentralized-style **Auction Platform** where users will be able to
 
 ---
 
-✍️ Author: [@nxtman0z](https://github.com/nxtman0z)  
+✍️ Author: [@nxtman0z](https://github.com/nxtman0z)
