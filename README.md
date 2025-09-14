@@ -35,7 +35,7 @@ Auctra is a decentralized-style **Auction Platform** where users will be able to
 ## 📢 Status
 ✅ Frontend deployed  
 🔄 Backend in progress  
-⏳ Full DApp version coming soon  
+⏳ Full DApp version coming soon Stay Tunned 
 
 ---
 
