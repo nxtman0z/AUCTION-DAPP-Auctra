@@ -38,4 +38,6 @@ A modern, responsive frontend web application for a decentralized auction platfo
 - **Smart Contract Ready**: Prepared for blockchain backend integration
 - **Form Handling**: Professional forms with validation and Formspree integration
 Built with ❤️ for the decentralized future
+.....
+
 
